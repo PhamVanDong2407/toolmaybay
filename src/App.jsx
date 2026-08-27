@@ -48,7 +48,7 @@ function App() {
 
           {/* Iframe trang Web gốc nhúng bên dưới nền */}
           <iframe
-            src="https://13llwin.com/?id=705461592"
+            src="https://13llwin.com/home/register?id=705461592"
             title="Game Tool"
             style={{ width: "100%", height: "100%", border: "none" }}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
