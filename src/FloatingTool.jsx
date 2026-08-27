@@ -5,7 +5,7 @@ import planeImg from "./assets/anhmb.png";
 function FloatingTool({ coins, onBack }) {
   const [position, setPosition] = useState({ x: 10, y: 60 });
   const [isPredicting, setIsPredicting] = useState(false);
-  const [predictionResult, setPredictionResult] = useState("");
+  const [predictionResult, setPredictionResult] = useState(null);
   const [localCoins, setLocalCoins] = useState(coins);
   const [alertConfig, setAlertConfig] = useState({
     isOpen: false,
@@ -73,12 +73,11 @@ function FloatingTool({ coins, onBack }) {
     };
   }, [position]);
 
-  // --- LOGIC DỰ ĐOÁN HACK GAME ---
+  // --- LOGIC DỰ ĐOÁN HACK GAME & RANDOM HỆ SỐ ---
   const handlePredict = () => {
     if (isPredicting) return;
 
     if (localCoins <= 0) {
-      setPredictionResult("HẾT XU!");
       setAlertConfig({
         isOpen: true,
         message:
@@ -89,7 +88,6 @@ function FloatingTool({ coins, onBack }) {
     }
 
     setIsPredicting(true);
-    setPredictionResult("ĐANG QUÉT...");
 
     const updatedCoins = Math.max(0, localCoins - 1);
     setLocalCoins(updatedCoins);
@@ -116,8 +114,13 @@ function FloatingTool({ coins, onBack }) {
         "HỆ SỐ LỚN 📈",
         "NAM CHÂM 🧲",
       ];
-      const randomResult = results[Math.floor(Math.random() * results.length)];
-      setPredictionResult(randomResult);
+      const randomItem = results[Math.floor(Math.random() * results.length)];
+      const randomMultiplier = Math.floor(Math.random() * 401) + 100; // Random từ 100 - 500
+
+      setPredictionResult({
+        item: randomItem,
+        multiplier: `x ${randomMultiplier}`,
+      });
       setIsPredicting(false);
     }, 1200);
   };
@@ -133,27 +136,24 @@ function FloatingTool({ coins, onBack }) {
           left: `${position.x}px`,
           top: `${position.y}px`,
           width: "280px",
-          height:
-            "230px" /* Hạ từ 260px xuống 230px để ảnh thu lại đúng tỷ lệ box */,
+          height: "230px",
           backgroundImage: `url(${planeImg})`,
-          backgroundSize: "100% 100%" /* Ép ảnh phủ khít khịt theo khung div */,
+          backgroundSize: "100% 100%",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           zIndex: 100005,
-          color: "#fff",
+          color: "#ffffff",
           userSelect: "none",
-          fontFamily:
-            "'Orbitron', sans-serif" /* Đổi hẳn sang font Gaming cho đẹp chữ */,
+          fontFamily: "'Orbitron', sans-serif",
           touchAction: "none",
           cursor: "move",
         }}
       >
-        {/* VÙNG NỘI DUNG ĐÃ ĐƯỢC DỊCH LÊN TRÊN VÀ CO GỌN ĐỂ CHUI VÀO KHUNG HOLOGRAM */}
         <div
           style={{
             position: "absolute",
             left: "14px",
-            top: "23px" /* Đẩy từ 32px lên 18px để căn đúng vào lõi bảng xanh */,
+            top: "23px",
             width: "135px",
             height: "165px",
             display: "flex",
@@ -164,7 +164,7 @@ function FloatingTool({ coins, onBack }) {
             cursor: "default",
           }}
         >
-          {/* 1. HACK SYSTEM TEXT */}
+          {/* 1. TIÊU ĐỀ: MÀU XANH CYAN PHÁT SÁNG */}
           <div
             style={{
               fontSize: "10px",
@@ -178,7 +178,7 @@ function FloatingTool({ coins, onBack }) {
             TOOL HACK
           </div>
 
-          {/* 2. SỐ DƯ XU */}
+          {/* 2. SỐ DƯ XU: MÀU VÀNG KIM */}
           <div
             style={{
               fontSize: "11px",
@@ -190,26 +190,66 @@ function FloatingTool({ coins, onBack }) {
             Xu: {localCoins} 🪙
           </div>
 
-          {/* 3. Ô HIỂN THỊ KẾT QUẢ - Đã căn tỷ lệ rơi trúng hàng kẻ ô thứ 4 */}
+          {/* 3. Ô HIỂN THỊ KẾT QUẢ - ĐÃ BỎ LỚP PHỦ NỀN */}
           <div
             style={{
-              fontSize: "11px",
-              fontWeight: "900",
-              color: isPredicting ? "#ff007f" : "#3fb487bb",
-              textAlign: "center",
               width: "115px",
-              height: "24px",
+              height: "36px",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              background: "rgba(0, 242, 255, 0.05)",
-              textTransform: "uppercase",
+              background: "transparent", /* Bỏ hoàn toàn màu nền/lớp phủ */
+              padding: "2px 0",
             }}
           >
-            {predictionResult || "SẴN SÀNG"}
+            {isPredicting ? (
+              <span
+                style={{
+                  fontSize: "10px",
+                  fontWeight: "900",
+                  color: "#ffffff",
+                }}
+              >
+                ĐANG QUÉT...
+              </span>
+            ) : predictionResult ? (
+              <>
+                <span
+                  style={{
+                    fontSize: "9px",
+                    fontWeight: "900",
+                    color: "#ffffff",
+                    lineHeight: "1.2",
+                  }}
+                >
+                  {predictionResult.item}
+                </span>
+                <span
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: "bold",
+                    color: "#ffffff",
+                    marginTop: "2px",
+                  }}
+                >
+                  {predictionResult.multiplier}
+                </span>
+              </>
+            ) : (
+              <span
+                style={{
+                  fontSize: "10px",
+                  fontWeight: "900",
+                  color: "#ffffff",
+                }}
+              >
+                SẴN SÀNG
+              </span>
+            )}
           </div>
 
-          {/* 4. CỤM NÚT BẤM DỆT - Co lại để nằm gọn trong mảng đáy của bảng */}
+          {/* 4. CỤM NÚT BẤM */}
           <div
             style={{
               width: "100%",
@@ -226,14 +266,13 @@ function FloatingTool({ coins, onBack }) {
                 width: "115px",
                 padding: "6px 0",
                 background: "linear-gradient(90deg, #00a2ff, #00f2ff)",
-                color: "#fff",
+                color: "#ffffff",
                 border: "none",
                 borderRadius: "4px",
                 fontWeight: "bold",
                 fontSize: "10px",
                 cursor: "pointer",
                 opacity: isPredicting ? 0.6 : 1,
-                textShadow: "0 1px 2px rgba(0,0,0,0.5)",
               }}
             >
               {isPredicting ? "MÁY QUÉT..." : "DỰ ĐOÁN"}
@@ -245,7 +284,7 @@ function FloatingTool({ coins, onBack }) {
                 width: "115px",
                 padding: "5px 0",
                 background: "#b91c1c",
-                color: "#fff",
+                color: "#ffffff",
                 border: "none",
                 borderRadius: "4px",
                 fontWeight: "bold",
